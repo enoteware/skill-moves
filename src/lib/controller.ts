@@ -1,4 +1,4 @@
-import { InputDirection, PlayerDirection, ControllerInput } from "@/types/skillMove";
+import { InputDirection, PlayerDirection } from "@/types/skillMove";
 
 // Convert angle in degrees to one of 8 cardinal directions
 export function angleToDirection(angle: number): PlayerDirection {

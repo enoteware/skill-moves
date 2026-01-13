@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Controller } from "./Controller";
 import { DirectionSelector } from "./DirectionSelector";
-import { Platform, PlayerDirection } from "@/types/skillMove";
+import { Platform } from "@/types/skillMove";
 import { angleToDirection } from "@/lib/controller";
 
 interface SkillMoveDetailProps {

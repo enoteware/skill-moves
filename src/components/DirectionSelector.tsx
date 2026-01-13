@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { PlayerDirection } from "@/types/skillMove";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { angleToDirection } from "@/lib/controller";
+import { DirectionArrow } from "./DirectionArrow";
 import { cn } from "@/lib/utils";
 
 interface DirectionSelectorProps {
@@ -32,7 +32,7 @@ export function DirectionSelector({ angle, onAngleChange, className }: Direction
       <div className="text-center">
         <div className="text-2xl font-bold mb-1">{angle}°</div>
         <div className="text-sm text-muted-foreground">
-          Facing: <span className="font-semibold">{currentDirection}</span>
+          Facing: <span className="font-semibold"><DirectionArrow direction={currentDirection} showText={false} /> {currentDirection}</span>
         </div>
       </div>
 
@@ -96,7 +96,7 @@ export function DirectionSelector({ angle, onAngleChange, className }: Direction
             onClick={() => onAngleChange(preset.angle)}
             className="text-xs"
           >
-            {preset.label}
+            <DirectionArrow direction={preset.direction} showText={false} /> {preset.label}
           </Button>
         ))}
       </div>
