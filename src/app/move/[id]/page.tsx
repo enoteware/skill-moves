@@ -7,9 +7,11 @@ import { Platform } from "@/types/skillMove";
 import { AnimatedController, AnimatedControllerRef } from "@/components/AnimatedController";
 import { AnimationControls } from "@/components/AnimationControls";
 import { DirectionSelector } from "@/components/DirectionSelector";
+import { PracticeMode } from "@/components/PracticeMode";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronDown, ChevronUp } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChevronLeft, ChevronDown, ChevronUp, Play, Gamepad2 } from "lucide-react";
 import { angleToDirection } from "@/lib/controller";
 
 export default function SkillMoveDetailPage() {
@@ -32,6 +34,7 @@ export default function SkillMoveDetailPage() {
   const [isLooping, setIsLooping] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showDirectionSelector, setShowDirectionSelector] = useState(false);
+  const [mode, setMode] = useState<"watch" | "practice">("watch");
   const controllerRef = useRef<AnimatedControllerRef>(null);
 
   const move = getSkillMoveById(moveId);
@@ -83,58 +86,84 @@ export default function SkillMoveDetailPage() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-6">
-        {/* Controller - Large and centered */}
-        <div className="w-full max-w-lg mb-6">
-          <AnimatedController
-            ref={controllerRef}
-            input={move.inputs}
-            platform={platform}
-            playerDirection={playerDirection}
-            speed={speed}
-            loop={isLooping}
-            isPlaying={isPlaying}
-            onPlayStateChange={setIsPlaying}
-          />
-        </div>
+      <main className="flex-1 flex flex-col items-center px-4 py-6">
+        {/* Mode Toggle */}
+        <Tabs value={mode} onValueChange={(v) => setMode(v as "watch" | "practice")} className="w-full max-w-lg mb-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="watch" className="flex items-center gap-2">
+              <Play className="w-4 h-4" />
+              Watch
+            </TabsTrigger>
+            <TabsTrigger value="practice" className="flex items-center gap-2">
+              <Gamepad2 className="w-4 h-4" />
+              Practice
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Collapsible Settings */}
-        <div className="w-full max-w-lg space-y-3">
-          {/* Direction Selector - Collapsible */}
-          <div className="bg-card border border-border rounded-lg overflow-hidden">
-            <button
-              onClick={() => setShowDirectionSelector(!showDirectionSelector)}
-              className="w-full flex items-center justify-between p-3 hover:bg-muted/50 transition-colors"
-            >
-              <span className="text-sm font-medium">Player Direction: {playerDirection}</span>
-              {showDirectionSelector ? (
-                <ChevronUp className="h-4 w-4 text-muted-foreground" />
-              ) : (
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              )}
-            </button>
-            {showDirectionSelector && (
-              <div className="px-3 pb-3 border-t border-border pt-3">
-                <DirectionSelector angle={playerAngle} onAngleChange={setPlayerAngle} />
+          <TabsContent value="watch" className="mt-6">
+            {/* Controller - Large and centered */}
+            <div className="w-full mb-6">
+              <AnimatedController
+                ref={controllerRef}
+                input={move.inputs}
+                platform={platform}
+                playerDirection={playerDirection}
+                speed={speed}
+                loop={isLooping}
+                isPlaying={isPlaying}
+                onPlayStateChange={setIsPlaying}
+              />
+            </div>
+
+            {/* Collapsible Settings */}
+            <div className="w-full space-y-3">
+              {/* Direction Selector - Collapsible */}
+              <div className="bg-card border border-border rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setShowDirectionSelector(!showDirectionSelector)}
+                  className="w-full flex items-center justify-between p-3 hover:bg-muted/50 transition-colors"
+                >
+                  <span className="text-sm font-medium">Player Direction: {playerDirection}</span>
+                  {showDirectionSelector ? (
+                    <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </button>
+                {showDirectionSelector && (
+                  <div className="px-3 pb-3 border-t border-border pt-3">
+                    <DirectionSelector angle={playerAngle} onAngleChange={setPlayerAngle} />
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="practice" className="mt-6">
+            <PracticeMode
+              skillMove={move}
+              platform={platform}
+              playerDirection={playerDirection}
+            />
+          </TabsContent>
+        </Tabs>
       </main>
 
-      {/* Animation Controls - Fixed at bottom */}
-      <AnimationControls
-        isPlaying={isPlaying}
-        isLooping={isLooping}
-        speed={speed}
-        onPlayPause={() => setIsPlaying(!isPlaying)}
-        onLoopToggle={() => setIsLooping(!isLooping)}
-        onSpeedChange={setSpeed}
-        onReset={() => {
-          controllerRef.current?.reset();
-          setIsPlaying(false);
-        }}
-      />
+      {/* Animation Controls - Fixed at bottom (only show in watch mode) */}
+      {mode === "watch" && (
+        <AnimationControls
+          isPlaying={isPlaying}
+          isLooping={isLooping}
+          speed={speed}
+          onPlayPause={() => setIsPlaying(!isPlaying)}
+          onLoopToggle={() => setIsLooping(!isLooping)}
+          onSpeedChange={setSpeed}
+          onReset={() => {
+            controllerRef.current?.reset();
+            setIsPlaying(false);
+          }}
+        />
+      )}
     </div>
   );
 }
